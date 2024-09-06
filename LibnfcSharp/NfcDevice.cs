@@ -25,41 +25,17 @@ namespace LibnfcSharp
             DevicePointer = devicePointer;
         }
 
-        public bool AbortCommand()
-        {
-            var result = Libnfc.AbortCommand(DevicePointer);
-            if (result < 0)
-            {
-                Perror("nfc_abort_command");
-                return false;
-            }
-            return true;
-        }
+        public bool AbortCommand() =>
+            Libnfc.AbortCommand(DevicePointer) >= 0;
 
-        public bool InitiatorInit()
-        {
-            var result = Libnfc.InitiatorInit(DevicePointer);
-            if (result < 0)
-            {
-                Perror("nfc_initiator_init");
-                return false;
-            }
-            return true;
-        }
+        public bool InitiatorInit() =>
+            Libnfc.InitiatorInit(DevicePointer) >= 0;
 
         public int InitiatorSelectPassiveTarget(NfcModulation modulation, byte[] abtUid, uint length, ref NfcTarget pnt) =>
             Libnfc.InitiatorSelectPassiveTarget(DevicePointer, modulation, abtUid, length, ref pnt);
 
-        public bool DeviceSetPropertyBool(NfcProperty property, bool enable)
-        {
-            var result = Libnfc.DeviceSetPropertyBool(DevicePointer, property, enable);
-            if (result < 0)
-            {
-                Perror("nfc_device_set_property_bool");
-                return false;
-            }
-            return true;
-        }
+        public bool DeviceSetPropertyBool(NfcProperty property, bool enable) =>
+            Libnfc.DeviceSetPropertyBool(DevicePointer, property, enable) >= 0;
 
         public int InitiatorTransceiveBitsTimed(byte[] pbtTx, uint szTxBits, byte[] pbtTxPar, byte[] pbtRx, uint szRx, byte[] pbtRxPar, ref uint cycles) =>
             Libnfc.InitiatorTransceiveBitsTimed(DevicePointer, pbtTx, szTxBits, pbtTxPar, pbtRx, szRx, pbtRxPar, ref cycles);

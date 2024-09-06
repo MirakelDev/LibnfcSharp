@@ -20,16 +20,18 @@ namespace LibnfcSharp.Mifare
         private byte[] _rxBuffer = new byte[264];
         private NfcDevice _device;
         private NfcTarget _target;
+        private bool _enablePerrorLogging = false;
         private Func<byte, byte[], byte[]> _keyAProviderCallback;
 
         private MifareMagicCardType _magicCardType = MifareMagicCardType.NONE;
         public MifareMagicCardType MagicCardType { get { return _magicCardType; } }
         public byte[] Uid { get { return _target.TargetInfo.Iso14443aInfo.abtUid.Take(UID_SIZE).ToArray(); } }
 
-        public MifareClassic(NfcDevice device)
+        public MifareClassic(NfcDevice device, bool enablePerrorLogging = false)
         {
             _target = new NfcTarget();
             _device = device;
+            _enablePerrorLogging |= enablePerrorLogging;
         }
 
         public void RegisterKeyAProviderCallback(Func<byte, byte[], byte[]> keyAProviderCallback) =>
@@ -38,11 +40,22 @@ namespace LibnfcSharp.Mifare
         public void InitialDevice()
         {
             // Initialise NFC device as "initiator"
-            _device.InitiatorInit();
+            if (!_device.InitiatorInit())
+            {
+                Perror("nfc_initiator_init");
+            }
+
             // Let the reader only try once to find a tag
-            _device.DeviceSetPropertyBool(NfcProperty.InfiniteSelect, false);
+            if (!_device.DeviceSetPropertyBool(NfcProperty.InfiniteSelect, false))
+            {
+                Perror("nfc_device_set_property_bool");
+            }
+
             // Disable ISO14443-4 switching in order to read devices that emulate Mifare Classic with ISO14443-4 compliance.
-            _device.DeviceSetPropertyBool(NfcProperty.AutoIso14443_4, false);
+            if (!_device.DeviceSetPropertyBool(NfcProperty.AutoIso14443_4, false))
+            {
+                Perror("nfc_device_set_property_bool");
+            }
         }
 
         public bool SelectCard()
@@ -108,14 +121,14 @@ namespace LibnfcSharp.Mifare
             // Configure the CRC
             if (!_device.DeviceSetPropertyBool(NfcProperty.HandleCrc, false))
             {
-                _device.Perror("nfc_configure");
+                Perror("nfc_device_set_property_bool");
                 return false;
             }
 
             // Use raw send/receive methods
             if (!_device.DeviceSetPropertyBool(NfcProperty.EasyFraming, false))
             {
-                _device.Perror("nfc_configure");
+                Perror("nfc_device_set_property_bool");
                 return false;
             }
 
@@ -138,14 +151,14 @@ namespace LibnfcSharp.Mifare
             // Configure the CRC
             if (!_device.DeviceSetPropertyBool(NfcProperty.HandleCrc, true))
             {
-                _device.Perror("nfc_device_set_property_bool");
+                Perror("nfc_device_set_property_bool");
                 return false;
             }
 
             // Switch off raw send/receive methods
             if (!_device.DeviceSetPropertyBool(NfcProperty.EasyFraming, true))
             {
-                _device.Perror("nfc_device_set_property_bool");
+                Perror("nfc_device_set_property_bool");
                 return false;
             }
 
@@ -175,7 +188,7 @@ namespace LibnfcSharp.Mifare
                 }
                 else
                 {
-                    _device.Perror("nfc_initiator_transceive_bytes");
+                    Perror("nfc_initiator_transceive_bytes");
                 }
                 // if auth failed mifare card needs to be reselected
                 SelectCard();
@@ -209,7 +222,7 @@ namespace LibnfcSharp.Mifare
                 }
                 else
                 {
-                    _device.Perror("nfc_initiator_transceive_bytes");
+                    Perror("nfc_initiator_transceive_bytes");
                 }
                 SelectCard();
 
@@ -252,7 +265,7 @@ namespace LibnfcSharp.Mifare
                 }
                 else
                 {
-                    _device.Perror("nfc_initiator_transceive_bytes");
+                    Perror("nfc_initiator_transceive_bytes");
                 }
                 SelectCard();
 
@@ -299,5 +312,13 @@ namespace LibnfcSharp.Mifare
 
         public static int GetTrailerBlock(int block) =>
             4 * ((block / 4) + 1) - 1;
+
+        private void Perror(string source)
+        {
+            if (_enablePerrorLogging)
+            {
+                _device.Perror(source);
+            }
+        }
     }
 }
