@@ -64,18 +64,16 @@ namespace LibnfcSharp.Mifare
         public void IdentifyMagicCardType()
         {
             _magicCardType = MifareMagicCardType.NONE;
-            if (IsMagicGen2())
+
+            if (!UnlockCard(out _magicCardType))
             {
-                _magicCardType = MifareMagicCardType.GEN_2;
-            }
-            else
-            {
-                if (!UnlockCard(out _magicCardType))
-                {
-                    // Reselect card
-                    InitialDevice();
-                    WaitForCard();
-                }
+                // Reselect card
+                InitialDevice();
+                WaitForCard();
+
+                _magicCardType = IsMagicGen2()
+                    ? MifareMagicCardType.GEN_2
+                    : MifareMagicCardType.NONE;
             }
         }
 
@@ -213,6 +211,8 @@ namespace LibnfcSharp.Mifare
                 {
                     _device.Perror("nfc_initiator_transceive_bytes");
                 }
+                SelectCard();
+
                 return false;
             }
 
@@ -222,6 +222,8 @@ namespace LibnfcSharp.Mifare
             }
             else
             {
+                SelectCard();
+
                 return false;
             }
 
@@ -252,6 +254,8 @@ namespace LibnfcSharp.Mifare
                 {
                     _device.Perror("nfc_initiator_transceive_bytes");
                 }
+                SelectCard();
+
                 return false;
             }
 
