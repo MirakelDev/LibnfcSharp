@@ -8,6 +8,8 @@ namespace LibnfcSharp.Mifare
     public partial class MifareClassic
     {
         public const byte UID_SIZE = 4;
+        public const byte ACS_SIZE = 4;
+        public const byte ACS_OFFSET = 6;
         public const byte KEY_SIZE = 6;
         public const byte BLOCK_SIZE = 16;
         public const byte SECTOR_COUNT = 16;
@@ -15,6 +17,9 @@ namespace LibnfcSharp.Mifare
         public const byte BLOCKS_TOTAL_COUNT = BLOCKS_PER_SECTOR * SECTOR_COUNT;
 
         public static readonly byte[] FACTORY_KEY = new byte[KEY_SIZE] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+        public static readonly byte[] DEFAULT_ACS = new byte[ACS_SIZE] { 0x7F, 0x0F, 0x08, 0x69 };
+        public static readonly byte[] LOCKED_ACS = new byte[ACS_SIZE] { 0x0F, 0x0F, 0x0F, 0x69 };
+        public static readonly byte[] UNLOCKED_ACS = new byte[ACS_SIZE] { 0xFF, 0x07, 0x80, 0x69 };
         public static readonly byte[] EMPTY_BLOCK = new byte[BLOCK_SIZE] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
         private byte[] _rxBuffer = new byte[264];
@@ -90,6 +95,12 @@ namespace LibnfcSharp.Mifare
             }
         }
 
+        public bool HasUnlockedAccessConditions(byte sector, out byte[] accessConditions)
+        {
+            return ReadAccessConditions(sector, out accessConditions) &&
+                accessConditions.SequenceEqual(UNLOCKED_ACS);
+        }
+
         public bool ReadManufacturerBlock(out byte[] blockData)
         {
             blockData = new byte[16];
@@ -106,6 +117,32 @@ namespace LibnfcSharp.Mifare
             }
 
             return ReadBlock(0, out blockData);
+        }
+
+        public bool ReadAccessConditions(byte sector, out byte[] accessConditions)
+        {
+            accessConditions = new byte[ACS_SIZE];
+
+            var trailerBlock = GetTrailerBlock(sector * BLOCKS_PER_SECTOR);
+
+            if (MagicCardType == MifareMagicCardType.NONE ||
+                MagicCardType == MifareMagicCardType.GEN_2)
+            {
+                if (!Authenticate(0, MifareKeyType.KEY_A, FACTORY_KEY) &&
+                    !Authenticate(0, MifareKeyType.KEY_A, _keyAProviderCallback?.Invoke(0, Uid)))
+                {
+                    return false;
+                }
+
+            }
+
+            if (ReadBlock(trailerBlock, out byte[] blockData))
+            {
+                Array.Copy(blockData, ACS_OFFSET, accessConditions, 0, accessConditions.Length);
+
+                return true;
+            }
+            return false;
         }
 
         public bool UnlockCard(out MifareMagicCardType magicCardType)
@@ -310,8 +347,8 @@ namespace LibnfcSharp.Mifare
         public static bool IsTrailerBlock(uint block) =>
             (block + 1) % 4 == 0;
 
-        public static int GetTrailerBlock(int block) =>
-            4 * ((block / 4) + 1) - 1;
+        public static byte GetTrailerBlock(int block) =>
+            (byte)(4 * ((block / 4) + 1) - 1);
 
         private void Perror(string source)
         {
