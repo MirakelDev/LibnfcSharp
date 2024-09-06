@@ -1,4 +1,5 @@
 ﻿using LibnfcSharp.Mifare.Enums;
+using LibnfcSharp.Mifare.Models;
 using LibnfcSharp.PInvoke;
 using System;
 using System.Linq;
@@ -117,6 +118,13 @@ namespace LibnfcSharp.Mifare
             }
 
             return ReadBlock(0, out blockData);
+        }
+
+        public bool ReadManufacturerInfo(out ManufacturerInfo manufacturerInfo)
+        {
+            var result = ReadManufacturerBlock(out byte[] manufacturerBlock);
+            manufacturerInfo = new ManufacturerInfo(manufacturerBlock);
+            return result;
         }
 
         public bool ReadAccessConditions(byte sector, out byte[] accessConditions)
