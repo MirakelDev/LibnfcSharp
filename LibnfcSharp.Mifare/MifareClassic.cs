@@ -31,9 +31,10 @@ namespace LibnfcSharp.Mifare
 
         private MifareMagicCardType _magicCardType = MifareMagicCardType.NONE;
         public MifareMagicCardType MagicCardType { get { return _magicCardType; } }
-        public byte[] Uid { get { return _target.TargetInfo.Iso14443aInfo.abtUid.Take(UID_SIZE).ToArray(); } }
+        public byte[] Uid { get { return _target.TargetInfo.Iso14443aInfo.abtUid.Take((int)_target.TargetInfo.Iso14443aInfo.szUidLen).ToArray(); } }
         public byte Sak { get { return _target.TargetInfo.Iso14443aInfo.btSak; } }
         public byte[] Atqa { get { return _target.TargetInfo.Iso14443aInfo.abtAtqa; } }
+        public byte[] Ats { get { return _target.TargetInfo.Iso14443aInfo.abtAts.Take((int)_target.TargetInfo.Iso14443aInfo.szAtsLen).ToArray(); } }
 
         public MifareClassic(NfcDevice device, bool enablePerrorLogging = false)
         {
