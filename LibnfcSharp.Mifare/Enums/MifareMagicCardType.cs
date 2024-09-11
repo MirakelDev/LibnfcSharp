@@ -5,7 +5,7 @@ namespace LibnfcSharp.Mifare.Enums
     public enum MifareMagicCardType
     {
         [Description("Gen1 UID LOCKED")]
-        NONE,
+        GEN_1,
 
         [Description("Gen1A UID Changeable (Backdoor)")]
         GEN_1A,

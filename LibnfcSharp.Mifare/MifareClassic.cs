@@ -29,7 +29,7 @@ namespace LibnfcSharp.Mifare
         private bool _enablePerrorLogging = false;
         private Func<byte, byte[], byte[]> _keyAProviderCallback;
 
-        private MifareMagicCardType _magicCardType = MifareMagicCardType.NONE;
+        private MifareMagicCardType _magicCardType = MifareMagicCardType.GEN_1;
         public MifareMagicCardType MagicCardType { get { return _magicCardType; } }
         public byte[] Uid { get { return _target.TargetInfo.Iso14443aInfo.abtUid.Take((int)_target.TargetInfo.Iso14443aInfo.szUidLen).ToArray(); } }
         public byte Sak { get { return _target.TargetInfo.Iso14443aInfo.btSak; } }
@@ -85,7 +85,7 @@ namespace LibnfcSharp.Mifare
 
         public void IdentifyMagicCardType()
         {
-            _magicCardType = MifareMagicCardType.NONE;
+            _magicCardType = MifareMagicCardType.GEN_1;
 
             if (!UnlockCard(out _magicCardType))
             {
@@ -95,7 +95,7 @@ namespace LibnfcSharp.Mifare
 
                 _magicCardType = IsMagicGen2()
                     ? MifareMagicCardType.GEN_2
-                    : MifareMagicCardType.NONE;
+                    : MifareMagicCardType.GEN_1;
             }
         }
 
@@ -109,7 +109,7 @@ namespace LibnfcSharp.Mifare
         {
             blockData = new byte[16];
 
-            if (MagicCardType == MifareMagicCardType.NONE ||
+            if (MagicCardType == MifareMagicCardType.GEN_1 ||
                 MagicCardType == MifareMagicCardType.GEN_2)
             {
                 if (!Authenticate(0, MifareKeyType.KEY_A, FACTORY_KEY) &&
@@ -136,7 +136,7 @@ namespace LibnfcSharp.Mifare
 
             var trailerBlock = GetTrailerBlock(sector * BLOCKS_PER_SECTOR);
 
-            if (MagicCardType == MifareMagicCardType.NONE ||
+            if (MagicCardType == MifareMagicCardType.GEN_1 ||
                 MagicCardType == MifareMagicCardType.GEN_2)
             {
                 if (!Authenticate(0, MifareKeyType.KEY_A, FACTORY_KEY) &&
@@ -158,7 +158,7 @@ namespace LibnfcSharp.Mifare
 
         public bool UnlockCard(out MifareMagicCardType magicCardType)
         {
-            magicCardType = MifareMagicCardType.NONE;
+            magicCardType = MifareMagicCardType.GEN_1;
 
             byte[] abtHalt = { 0x50, 0x00, 0x00, 0x00 };
 
@@ -210,7 +210,7 @@ namespace LibnfcSharp.Mifare
                 return false;
             }
 
-            return magicCardType != MifareMagicCardType.NONE;
+            return magicCardType != MifareMagicCardType.GEN_1;
         }
 
         public bool Authenticate(byte sector, MifareKeyType keyType, byte[] key)
