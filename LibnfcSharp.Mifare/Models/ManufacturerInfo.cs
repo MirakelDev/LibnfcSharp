@@ -9,6 +9,7 @@ namespace LibnfcSharp.Mifare.Models
         public byte Sak { get; private set; }
         public byte[] Atqa { get; private set; }
         public byte[] ManufacturerData { get; private set; }
+        public byte[] RawData { get; private set; }
 
         private ManufacturerInfo()
         {
@@ -17,6 +18,7 @@ namespace LibnfcSharp.Mifare.Models
             Sak = 0x00;
             Atqa = new byte[2];
             ManufacturerData = new byte[8];
+            RawData = new byte[16];
         }
 
         public ManufacturerInfo(byte[] manufacturerBlock)
@@ -30,6 +32,7 @@ namespace LibnfcSharp.Mifare.Models
             Sak = manufacturerBlock[5];
             Atqa = manufacturerBlock.Skip(6).Take(2).Reverse().ToArray();
             ManufacturerData = manufacturerBlock.Skip(6).ToArray();
+            RawData = manufacturerBlock.Take(MifareClassic.BLOCK_SIZE).ToArray();
         }
     }
 }
