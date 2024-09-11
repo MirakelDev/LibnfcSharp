@@ -70,7 +70,8 @@ namespace LibnfcSharp.Mifare
             if (MagicCardType == MifareMagicCardType.GEN_1 ||
                 MagicCardType == MifareMagicCardType.GEN_2)
             {
-                if (Authenticate(sector, MifareKeyType.KEY_A, FACTORY_KEY))
+                if (Authenticate(sector, MifareKeyType.KEY_A, FACTORY_KEY) ||
+                    Authenticate(sector, MifareKeyType.KEY_A, _keyAProviderCallback?.Invoke(sector, Uid)))
                 {
                     _logCallback?.Invoke($"Sector {sector} authenticated successfully.");
                 }
