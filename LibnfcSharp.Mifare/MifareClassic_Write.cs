@@ -81,22 +81,21 @@ namespace LibnfcSharp.Mifare
                 }
             }
 
-            byte startBlock = sector == 0 && MagicCardType == MifareMagicCardType.GEN_1
-                ? (byte)1
-                : (byte)0;
+            byte startBlock = (byte)(sector == 0 ? 1 : 0);
 
             for (byte block = startBlock; block < BLOCKS_PER_SECTOR; block++)
             {
                 byte[] buffer = new byte[BLOCK_SIZE];
                 Array.Copy(sectorData, block * BLOCK_SIZE, buffer, 0, buffer.Length);
+                var globalBlock = GetGlobalBlock(sector, block);
 
-                if (WriteBlock(block, buffer))
+                if (WriteBlock(globalBlock, buffer))
                 {
-                    _logCallback?.Invoke($"Sector {sector}, block {block} written successfully.");
+                    _logCallback?.Invoke($"Block {globalBlock} written successfully.");
                 }
                 else
                 {
-                    _logCallback?.Invoke($"Error: Writing sector {sector}, block {block} failed!");
+                    _logCallback?.Invoke($"Error: Writing Block {globalBlock} failed!");
                     return false;
                 }
             }

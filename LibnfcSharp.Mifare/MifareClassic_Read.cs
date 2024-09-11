@@ -36,7 +36,7 @@ namespace LibnfcSharp.Mifare
         {
             accessConditions = new byte[ACS_SIZE];
 
-            var trailerBlock = GetTrailerBlock(sector * BLOCKS_PER_SECTOR);
+            var trailerBlock = GetTrailerBlock((byte)(sector * BLOCKS_PER_SECTOR));
 
             if (MagicCardType == MifareMagicCardType.GEN_1 ||
                 MagicCardType == MifareMagicCardType.GEN_2)

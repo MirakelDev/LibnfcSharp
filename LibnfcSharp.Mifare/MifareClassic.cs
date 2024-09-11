@@ -229,14 +229,17 @@ namespace LibnfcSharp.Mifare
             return false;
         }
 
-        public static bool IsFirstBlock(int block) =>
+        public static bool IsFirstBlock(byte block) =>
             block % 4 == 0;
 
-        public static bool IsTrailerBlock(uint block) =>
+        public static bool IsTrailerBlock(byte block) =>
             (block + 1) % 4 == 0;
 
-        public static byte GetTrailerBlock(int block) =>
+        public static byte GetTrailerBlock(byte block) =>
             (byte)(4 * ((block / 4) + 1) - 1);
+
+        public static byte GetGlobalBlock(byte sector, byte blockOfSector) =>
+            (byte)(blockOfSector + (sector * BLOCKS_PER_SECTOR));
 
         private void Perror(string source)
         {
