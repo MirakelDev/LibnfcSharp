@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace LibnfcSharp.Mifare
 {
-    public partial class MifareClassic
+    public class MifareClassic
     {
         public const byte UID_SIZE = 4;
         public const byte ACS_SIZE = 4;
