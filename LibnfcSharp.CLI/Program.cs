@@ -42,7 +42,7 @@ namespace LibnfcSharp.CLI
                     mfc.ReadBlock(3, out blockData);
                     PrintHex(blockData, MifareClassic.BLOCK_SIZE);
 
-                    if (mfc.MagicCardType == MifareMagicCardType.NONE ||
+                    if (mfc.MagicCardType == MifareMagicCardType.GEN_1 ||
                         mfc.MagicCardType == MifareMagicCardType.GEN_2)
                     {
                         if (mfc.Authenticate(0, MifareKeyType.KEY_A, MifareClassic.FACTORY_KEY))
