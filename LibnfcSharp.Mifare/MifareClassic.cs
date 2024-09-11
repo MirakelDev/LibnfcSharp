@@ -40,7 +40,7 @@ namespace LibnfcSharp.Mifare
         {
             _target = new NfcTarget();
             _device = device;
-            _enablePerrorLogging |= enablePerrorLogging;
+            _enablePerrorLogging = enablePerrorLogging;
         }
 
         public void RegisterKeyAProviderCallback(Func<byte, byte[], byte[]> keyAProviderCallback) =>
