@@ -95,6 +95,11 @@ namespace LibnfcSharp.Mifare
                     _logCallback?.Invoke($"Block {globalBlock} written successfully.");
                 }
                 else
+                if (IsTrailerBlock(block) && !HasUnlockedAccessConditions(sector, out _, true))
+                {
+                    _logCallback?.Invoke($"Skipping block {globalBlock} (Trailer block).");
+                }
+                else
                 {
                     _logCallback?.Invoke($"Error: Writing Block {globalBlock} failed!");
                     return false;
