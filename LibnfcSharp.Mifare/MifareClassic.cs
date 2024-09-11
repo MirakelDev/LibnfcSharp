@@ -103,9 +103,9 @@ namespace LibnfcSharp.Mifare
             }
         }
 
-        public bool HasUnlockedAccessConditions(byte sector, out byte[] accessConditions)
+        public bool HasUnlockedAccessConditions(byte sector, out byte[] accessConditions, bool skipAuthentication = false)
         {
-            return ReadAccessConditions(sector, out accessConditions) &&
+            return ReadAccessConditions(sector, out accessConditions, skipAuthentication) &&
                 accessConditions.SequenceEqual(UNLOCKED_ACS);
         }
 

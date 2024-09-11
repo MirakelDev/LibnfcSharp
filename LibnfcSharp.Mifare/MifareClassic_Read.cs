@@ -32,7 +32,7 @@ namespace LibnfcSharp.Mifare
             return ReadBlock(0, out manufacturerBlockData);
         }
 
-        public bool ReadAccessConditions(byte sector, out byte[] accessConditions)
+        public bool ReadAccessConditions(byte sector, out byte[] accessConditions, bool skipAuthentication = false)
         {
             accessConditions = new byte[ACS_SIZE];
 
@@ -41,8 +41,9 @@ namespace LibnfcSharp.Mifare
             if (MagicCardType == MifareMagicCardType.GEN_1 ||
                 MagicCardType == MifareMagicCardType.GEN_2)
             {
-                if (!Authenticate(0, MifareKeyType.KEY_A, FACTORY_KEY) &&
-                    !Authenticate(0, MifareKeyType.KEY_A, _keyAProviderCallback?.Invoke(0, Uid)))
+                if (!skipAuthentication &&
+                    !Authenticate(sector, MifareKeyType.KEY_A, FACTORY_KEY) &&
+                    !Authenticate(sector, MifareKeyType.KEY_A, _keyAProviderCallback?.Invoke(0, Uid)))
                 {
                     return false;
                 }
