@@ -56,7 +56,7 @@ namespace LibnfcSharp.PInvoke
         public static extern void Close(IntPtr pnd);
 
         [DllImport(LibraryName, EntryPoint = "nfc_list_devices", CallingConvention = CallingConvention.Cdecl)]
-        public static extern long ListDevices(IntPtr context, IntPtr connstrings, uint connstrings_len);
+        public static extern int ListDevices(IntPtr context, IntPtr connstrings, uint connstrings_len);
 
         [DllImport(LibraryName, EntryPoint = "nfc_abort_command", CallingConvention = CallingConvention.Cdecl)]
         public static extern int AbortCommand(IntPtr pnd);
