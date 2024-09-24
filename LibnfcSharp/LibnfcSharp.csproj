@@ -20,6 +20,9 @@
   </Target>
 
   <ItemGroup>
+    <None Update="libnfc.conf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="libusb0.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
