@@ -52,10 +52,10 @@ namespace LibnfcSharp.PInvoke
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
         public byte[] abtAtqa;//[2];
         public byte btSak;
-        public ulong szUidLen;
+        public uint szUidLen;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
         public byte[] abtUid;//[10];
-        public ulong szAtsLen;
+        public uint szAtsLen;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 254)]
         public byte[] abtAts;//[254]; // Maximal theoretical ATS is FSD-2, FSD=256 for FSDI=8 in RATS
     }
