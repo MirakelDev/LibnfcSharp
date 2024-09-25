@@ -24,7 +24,7 @@ namespace LibnfcSharp
             IntPtr connectionStringsPointer = Marshal.AllocHGlobal(Libnfc.ConnectStringBufferSize * count);
             var devicesCount = Libnfc.ListDevices(contextPointer, connectionStringsPointer, (uint)count);
 
-            var devices = new List<string>((int)devicesCount);
+            var devices = new List<string>(devicesCount);
             for (int i = 0; i < devicesCount; i++)
                 devices.Add(Marshal.PtrToStringAnsi(connectionStringsPointer + i * count));
 

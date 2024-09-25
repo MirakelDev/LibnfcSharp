@@ -6,6 +6,7 @@
     <Title>$(MSBuildProjectName)</Title>
     <Product>$(MSBuildProjectName)</Product>
     <Description>.NET Wrapper for libnfc Library</Description>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +21,9 @@
   </Target>
 
   <ItemGroup>
+    <None Update="libnfc.conf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="libusb0.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
