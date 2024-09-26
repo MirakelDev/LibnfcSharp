@@ -59,6 +59,70 @@ namespace LibnfcSharp.Mifare
             return false;
         }
 
+        public bool ReadCard(out byte[] cardData)
+        {
+            _logCallback?.Invoke("Reading card...");
+
+            cardData = new byte[BLOCK_SIZE * BLOCKS_TOTAL_COUNT];
+
+            for (byte sector = 0; sector < SECTOR_COUNT; sector++)
+            {
+                if (ReadSector(sector, out byte[] sectorData))
+                {
+                    Array.Copy(sectorData, 0, cardData, sector * BLOCK_SIZE * BLOCKS_PER_SECTOR, sectorData.Length);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            _logCallback?.Invoke("Card read successfully.");
+
+            return true;
+        }
+
+        public bool ReadSector(byte sector, out byte[] sectorData)
+        {
+            sectorData = new byte[BLOCK_SIZE * BLOCKS_PER_SECTOR];
+
+            if (MagicCardType == MifareMagicCardType.GEN_1 ||
+                MagicCardType == MifareMagicCardType.GEN_2)
+            {
+                if (Authenticate(sector, MifareKeyType.KEY_A, FACTORY_KEY) ||
+                    Authenticate(sector, MifareKeyType.KEY_A, _keyAProviderCallback?.Invoke(sector, Uid)))
+                {
+                    _logCallback?.Invoke($"Sector {sector} authenticated successfully.");
+                }
+                else
+                {
+                    _logCallback?.Invoke($"Error: Authenticating sector {sector} failed!");
+                    return false;
+                }
+            }
+
+            for (byte block = 0; block < BLOCKS_PER_SECTOR; block++)
+            {
+                var globalBlock = GetGlobalBlock(sector, block);
+
+                if (ReadBlock(globalBlock, out byte[] blockData))
+                {
+                    Array.Copy(blockData, 0, sectorData, block * BLOCK_SIZE, blockData.Length);
+
+                    _logCallback?.Invoke($"Block {globalBlock} read successfully.");
+                }
+                else
+                {
+                    _logCallback?.Invoke($"Error: Reading Block {globalBlock} failed!");
+                    return false;
+                }
+            }
+
+            _logCallback?.Invoke($"Sector {sector} read successfully.");
+
+            return true;
+        }
+
         public bool ReadBlock(byte block, out byte[] blockData)
         {
             blockData = new byte[BLOCK_SIZE];
