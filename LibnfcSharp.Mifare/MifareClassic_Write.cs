@@ -121,8 +121,7 @@ namespace LibnfcSharp.Mifare
             abtCmd[1] = block;
             Array.Copy(blockData, 0, abtCmd, 2, BLOCK_SIZE);
 
-            int result;
-            if ((result = _device.InitiatorTransceiveBytes(abtCmd, (uint)abtCmd.Length, _rxBuffer, (uint)_rxBuffer.Length, 0)) < 0)
+            if (!TransmitBytes(abtCmd, (uint)abtCmd.Length, out int result))
             {
                 if (result == (int)NfcError.NFC_ERFTRANS)
                 {
