@@ -134,15 +134,15 @@ namespace LibnfcSharp.Mifare
             }
 
             _device.Iso14443aCrcAppend(abtHalt, 2);
-            _device.InitiatorTransceiveBytes(abtHalt, 4, _rxBuffer, (uint)_rxBuffer.Length, 0); //transmit_bytes(abtHalt, 4);
+            TransmitBytes(abtHalt, 4);
 
             // now send unlock1 => Gen1B
-            if (_device.InitiatorTransceiveBits(abtUnlock1, 7, null, _rxBuffer, (uint)_rxBuffer.Length, null) > 0 && _rxBuffer[0] == (byte)MifareResponseType.ACK) // transmit_bits(abtUnlock1, 7)
+            if (TransmitBits(abtUnlock1, 7) && _rxBuffer[0] == (byte)MifareResponseType.ACK) // transmit_bits(abtUnlock1, 7)
             {
                 magicCardType = MifareMagicCardType.GEN_1B;
 
                 // then send unlock2 => Gen1A
-                if (_device.InitiatorTransceiveBytes(abtUnlock2, 1, _rxBuffer, (uint)_rxBuffer.Length, 0) > 0 && _rxBuffer[0] == (byte)MifareResponseType.ACK) // transmit_bytes(abtUnlock2, 1)
+                if (TransmitBytes(abtUnlock2, 1) && _rxBuffer[0] == (byte)MifareResponseType.ACK) // transmit_bytes(abtUnlock2, 1)
                 {
                     magicCardType = MifareMagicCardType.GEN_1A;
                 }
@@ -177,8 +177,7 @@ namespace LibnfcSharp.Mifare
             Array.Copy(key, 0, abtCmd, 2, KEY_SIZE);
             Array.Copy(Uid, 0, abtCmd, 8, UID_SIZE);
 
-            int result;
-            if ((result = _device.InitiatorTransceiveBytes(abtCmd, (uint)abtCmd.Length, _rxBuffer, (uint)_rxBuffer.Length, 0)) < 0)
+            if (!TransmitBytes(abtCmd, (uint)abtCmd.Length, out int result))
             {
                 if (result == (int)NfcError.NFC_ERFTRANS)
                 {
@@ -248,5 +247,14 @@ namespace LibnfcSharp.Mifare
                 _device.Perror(source);
             }
         }
+
+        private bool TransmitBits(byte[] pbtTx, uint szTxBits) =>
+            _device.InitiatorTransceiveBits(pbtTx, szTxBits, null, _rxBuffer, (uint)_rxBuffer.Length, null) >= 0;
+
+        private bool TransmitBytes(byte[] pbtTx, uint szTx) =>
+            TransmitBytes(pbtTx, szTx, out _);
+
+        private bool TransmitBytes(byte[] pbtTx, uint szTx, out int result) =>
+            (result = _device.InitiatorTransceiveBytes(pbtTx, szTx, _rxBuffer, (uint)_rxBuffer.Length, 0)) >= 0;
     }
 }
