@@ -67,6 +67,8 @@ namespace LibnfcSharp.Mifare
 
         public bool WriteSector(byte sector, byte[] sectorData)
         {
+            var hasUnlockedAccessConditions = true;
+
             if (MagicCardType == MifareMagicCardType.GEN_1 ||
                 MagicCardType == MifareMagicCardType.GEN_2)
             {
@@ -80,8 +82,11 @@ namespace LibnfcSharp.Mifare
                     _logCallback?.Invoke($"Error: Authenticating sector {sector} failed!");
                     return false;
                 }
+
+                hasUnlockedAccessConditions = HasUnlockedAccessConditions(sector, out _, true);
             }
 
+            var skippingSectorZero = false;
             byte startBlock = (byte)(sector == 0 ? 1 : 0);
 
             for (byte block = startBlock; block < BLOCKS_PER_SECTOR; block++)
@@ -93,9 +98,16 @@ namespace LibnfcSharp.Mifare
                 if (WriteBlock(globalBlock, buffer))
                 {
                     _logCallback?.Invoke($"Block {globalBlock} written successfully.");
+                    skippingSectorZero = false;
                 }
                 else
-                if (IsTrailerBlock(block) && !HasUnlockedAccessConditions(sector, out _, true))
+                if (sector == 0 && !hasUnlockedAccessConditions)
+                {
+                    _logCallback?.Invoke($"Skipping block {globalBlock} (Sector 0).");
+                    skippingSectorZero = true;
+                }
+                else
+                if (IsTrailerBlock(block) && !hasUnlockedAccessConditions)
                 {
                     _logCallback?.Invoke($"Skipping block {globalBlock} (Trailer block).");
                 }
@@ -106,7 +118,14 @@ namespace LibnfcSharp.Mifare
                 }
             }
 
-            _logCallback?.Invoke($"Sector {sector} written successfully.");
+            if (skippingSectorZero)
+            {
+                _logCallback?.Invoke($"Sector {sector} skipped.");
+            }
+            else
+            {
+                _logCallback?.Invoke($"Sector {sector} written successfully.");
+            }
 
             return true;
         }
