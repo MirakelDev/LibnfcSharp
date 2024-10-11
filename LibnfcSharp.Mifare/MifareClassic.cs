@@ -240,6 +240,9 @@ namespace LibnfcSharp.Mifare
         public static byte GetGlobalBlock(byte sector, byte blockOfSector) =>
             (byte)(blockOfSector + (sector * BLOCKS_PER_SECTOR));
 
+        public static byte GetSector(byte globalBlock) =>
+            (byte)(globalBlock / 4);
+
         private void Perror(string source)
         {
             if (_enablePerrorLogging)
