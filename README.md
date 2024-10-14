@@ -1,5 +1,8 @@
 # LibnfcSharp
 
+[![NuGet Package](https://img.shields.io/nuget/v/LibnfcSharp.svg)](https://www.nuget.org/packages/LibnfcSharp/)
+[![Build Status](https://img.shields.io/appveyor/ci/MirakelDev/LibnfcSharp.svg)](https://ci.appveyor.com/project/MirakelDev/LibnfcSharp)
+
 **LibnfcSharp** is a .NET wrapper for the `libnfc` library (version 1.8.0, x86 build), providing a managed interface for developers to easily interact with NFC (Near Field Communication) devices in their .NET applications. This wrapper simplifies the integration of NFC functionalities, allowing for seamless communication with various NFC hardware.
 
 ## Features
