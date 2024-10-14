@@ -61,7 +61,7 @@ namespace LibnfcSharp.Mifare
 
         public bool ReadCard(out byte[] cardData)
         {
-            _logCallback?.Invoke("Reading card...");
+            _logCallback?.Invoke(LogLevel.Information, "Reading card...");
 
             cardData = new byte[BLOCK_SIZE * BLOCKS_TOTAL_COUNT];
 
@@ -77,7 +77,7 @@ namespace LibnfcSharp.Mifare
                 }
             }
 
-            _logCallback?.Invoke("Card read successfully.");
+            _logCallback?.Invoke(LogLevel.Information, "Card read successfully.");
 
             return true;
         }
@@ -92,11 +92,11 @@ namespace LibnfcSharp.Mifare
                 if (Authenticate(sector, MifareKeyType.KEY_A, FACTORY_KEY) ||
                     Authenticate(sector, MifareKeyType.KEY_A, _keyAProviderCallback?.Invoke(sector, Uid)))
                 {
-                    _logCallback?.Invoke($"Sector {sector} authenticated successfully.");
+                    _logCallback?.Invoke(LogLevel.Debug, $"Sector {sector} authenticated successfully.");
                 }
                 else
                 {
-                    _logCallback?.Invoke($"Error: Authenticating sector {sector} failed!");
+                    _logCallback?.Invoke(LogLevel.Error, $"Error: Authenticating sector {sector} failed!");
                     return false;
                 }
             }
@@ -109,16 +109,16 @@ namespace LibnfcSharp.Mifare
                 {
                     Array.Copy(blockData, 0, sectorData, block * BLOCK_SIZE, blockData.Length);
 
-                    _logCallback?.Invoke($"Block {globalBlock} read successfully.");
+                    _logCallback?.Invoke(LogLevel.Debug, $"Block {globalBlock} read successfully.");
                 }
                 else
                 {
-                    _logCallback?.Invoke($"Error: Reading Block {globalBlock} failed!");
+                    _logCallback?.Invoke(LogLevel.Error, $"Error: Reading Block {globalBlock} failed!");
                     return false;
                 }
             }
 
-            _logCallback?.Invoke($"Sector {sector} read successfully.");
+            _logCallback?.Invoke(LogLevel.Debug, $"Sector {sector} read successfully.");
 
             return true;
         }

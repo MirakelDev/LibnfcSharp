@@ -24,7 +24,7 @@ namespace LibnfcSharp.Mifare
 
         public bool WriteDump(byte[] dumpData)
         {
-            _logCallback?.Invoke("Writing dump...");
+            _logCallback?.Invoke(LogLevel.Information, "Writing dump...");
 
             bool success = false;
 
@@ -51,16 +51,16 @@ namespace LibnfcSharp.Mifare
                 success = WriteManufacturerBlock(buffer);
                 if (success)
                 {
-                    _logCallback?.Invoke($"Manufacturer block written successfully.");
+                    _logCallback?.Invoke(LogLevel.Debug, $"Manufacturer block written successfully.");
                 }
                 else
                 {
-                    _logCallback?.Invoke($"Error: Writing manufacturer block failed!");
+                    _logCallback?.Invoke(LogLevel.Error, $"Error: Writing manufacturer block failed!");
                 }
             }
 
             if (success)
-                _logCallback?.Invoke("Dump written successfully.");
+                _logCallback?.Invoke(LogLevel.Information, "Dump written successfully.");
 
             return success;
         }
@@ -75,11 +75,11 @@ namespace LibnfcSharp.Mifare
                 if (Authenticate(sector, MifareKeyType.KEY_A, FACTORY_KEY) ||
                     Authenticate(sector, MifareKeyType.KEY_A, _keyAProviderCallback?.Invoke(sector, Uid)))
                 {
-                    _logCallback?.Invoke($"Sector {sector} authenticated successfully.");
+                    _logCallback?.Invoke(LogLevel.Debug, $"Sector {sector} authenticated successfully.");
                 }
                 else
                 {
-                    _logCallback?.Invoke($"Error: Authenticating sector {sector} failed!");
+                    _logCallback?.Invoke(LogLevel.Error, $"Error: Authenticating sector {sector} failed!");
                     return false;
                 }
 
@@ -97,34 +97,34 @@ namespace LibnfcSharp.Mifare
 
                 if (WriteBlock(globalBlock, buffer))
                 {
-                    _logCallback?.Invoke($"Block {globalBlock} written successfully.");
+                    _logCallback?.Invoke(LogLevel.Debug, $"Block {globalBlock} written successfully.");
                     skippingSectorZero = false;
                 }
                 else
                 if (sector == 0 && !hasUnlockedAccessConditions)
                 {
-                    _logCallback?.Invoke($"Skipping block {globalBlock} (Sector 0).");
+                    _logCallback?.Invoke(LogLevel.Debug, $"Skipping block {globalBlock} (Sector 0).");
                     skippingSectorZero = true;
                 }
                 else
                 if (IsTrailerBlock(block) && !hasUnlockedAccessConditions)
                 {
-                    _logCallback?.Invoke($"Skipping block {globalBlock} (Trailer block).");
+                    _logCallback?.Invoke(LogLevel.Debug, $"Skipping block {globalBlock} (Trailer block).");
                 }
                 else
                 {
-                    _logCallback?.Invoke($"Error: Writing Block {globalBlock} failed!");
+                    _logCallback?.Invoke(LogLevel.Error, $"Error: Writing Block {globalBlock} failed!");
                     return false;
                 }
             }
 
             if (skippingSectorZero)
             {
-                _logCallback?.Invoke($"Sector {sector} skipped.");
+                _logCallback?.Invoke(LogLevel.Information, $"Sector {sector} skipped.");
             }
             else
             {
-                _logCallback?.Invoke($"Sector {sector} written successfully.");
+                _logCallback?.Invoke(LogLevel.Information, $"Sector {sector} written successfully.");
             }
 
             return true;
