@@ -1,4 +1,5 @@
-﻿using LibnfcSharp.PInvoke;
+﻿using LibnfcSharp.Mifare.Enums;
+using LibnfcSharp.PInvoke;
 using System;
 
 namespace LibnfcSharp.Mifare
@@ -47,7 +48,7 @@ namespace LibnfcSharp.Mifare
             }
             else
             {
-                _logCallback?.Invoke("Error: Wrong length of UID (4 byte) / Block 0 (16 byte)");
+                _logCallback?.Invoke(LogLevel.Error, "Error: Wrong length of UID (4 byte) / Block 0 (16 byte)");
                 return false;
             }
 
@@ -81,7 +82,7 @@ namespace LibnfcSharp.Mifare
             // Send the 7 bits request command specified in ISO 14443A (0x26)
             if (!TransmitBits(abtReqa, 7))
             {
-                _logCallback?.Invoke("Error: No tag available");
+                _logCallback?.Invoke(LogLevel.Error, "Error: No tag available");
 
                 return false;
             }
@@ -94,7 +95,7 @@ namespace LibnfcSharp.Mifare
             // Check answer
             if ((_rxBuffer[0] ^ _rxBuffer[1] ^ _rxBuffer[2] ^ _rxBuffer[3] ^ _rxBuffer[4]) != 0)
             {
-                _logCallback?.Invoke("WARNING: BCC check failed!");
+                _logCallback?.Invoke(LogLevel.Warning, "Warning: BCC check failed!");
             }
 
             // Save the UID CL1
@@ -115,7 +116,7 @@ namespace LibnfcSharp.Mifare
                 // Check answer
                 if (abtRawUid[0] != 0x88)
                 {
-                    _logCallback?.Invoke("WARNING: Cascade bit set but CT != 0x88!");
+                    _logCallback?.Invoke(LogLevel.Warning, "Warning: Cascade bit set but CT != 0x88!");
                 }
             }
 
@@ -132,7 +133,7 @@ namespace LibnfcSharp.Mifare
                 // Check answer
                 if ((_rxBuffer[0] ^ _rxBuffer[1] ^ _rxBuffer[2] ^ _rxBuffer[3] ^ _rxBuffer[4]) != 0)
                 {
-                    _logCallback?.Invoke("WARNING: BCC check failed!\n");
+                    _logCallback?.Invoke(LogLevel.Warning, "Warning: BCC check failed!\n");
                 }
 
 
@@ -154,7 +155,7 @@ namespace LibnfcSharp.Mifare
                     // Check answer
                     if (abtRawUid[0] != 0x88)
                     {
-                        _logCallback?.Invoke("WARNING: Cascade bit set but CT != 0x88!");
+                        _logCallback?.Invoke(LogLevel.Warning, "Warning: Cascade bit set but CT != 0x88!");
                     }
                 }
 
@@ -169,7 +170,7 @@ namespace LibnfcSharp.Mifare
                     // Check answer
                     if ((_rxBuffer[0] ^ _rxBuffer[1] ^ _rxBuffer[2] ^ _rxBuffer[3] ^ _rxBuffer[4]) != 0)
                     {
-                        _logCallback?.Invoke("WARNING: BCC check failed!");
+                        _logCallback?.Invoke(LogLevel.Warning, "Warning: BCC check failed!");
                     }
 
                     // Save UID CL3
@@ -190,24 +191,24 @@ namespace LibnfcSharp.Mifare
                 iso_ats_supported = true;
             }
 
-            _logCallback?.Invoke("\nFound tag with\n UID: ");
+            _logCallback?.Invoke(LogLevel.Debug, "\nFound tag with\n UID: ");
             switch (szCL)
             {
                 case 1:
-                    _logCallback?.Invoke($"{abtRawUid[0]:X2}{abtRawUid[1]:X2}{abtRawUid[2]:X2}{abtRawUid[3]:X2}");
+                    _logCallback?.Invoke(LogLevel.Debug, $"{abtRawUid[0]:X2}{abtRawUid[1]:X2}{abtRawUid[2]:X2}{abtRawUid[3]:X2}");
                     break;
 
                 case 2:
-                    _logCallback?.Invoke($"{abtRawUid[1]:X2}{abtRawUid[2]:X2}{abtRawUid[3]:X2}{abtRawUid[4]:X2}{abtRawUid[5]:X2}{abtRawUid[6]:X2}{abtRawUid[7]:X2}");
+                    _logCallback?.Invoke(LogLevel.Debug, $"{abtRawUid[1]:X2}{abtRawUid[2]:X2}{abtRawUid[3]:X2}{abtRawUid[4]:X2}{abtRawUid[5]:X2}{abtRawUid[6]:X2}{abtRawUid[7]:X2}");
                     break;
 
                 case 3:
-                    _logCallback?.Invoke($"{abtRawUid[1]:X2}{abtRawUid[2]:X2}{abtRawUid[3]:X2}{abtRawUid[5]:X2}{abtRawUid[6]:X2}{abtRawUid[7]:X2}{abtRawUid[8]:X2}{abtRawUid[9]:X2}{abtRawUid[10]:X2}{abtRawUid[11]:X2}");
+                    _logCallback?.Invoke(LogLevel.Debug, $"{abtRawUid[1]:X2}{abtRawUid[2]:X2}{abtRawUid[3]:X2}{abtRawUid[5]:X2}{abtRawUid[6]:X2}{abtRawUid[7]:X2}{abtRawUid[8]:X2}{abtRawUid[9]:X2}{abtRawUid[10]:X2}{abtRawUid[11]:X2}");
                     break;
             }
 
-            _logCallback?.Invoke($"ATQA: {abtAtqa[1]:X2}{abtAtqa[0]:X2}");
-            _logCallback?.Invoke($"SAK: {abtSak:X2}");
+            _logCallback?.Invoke(LogLevel.Debug, $"ATQA: {abtAtqa[1]:X2}{abtAtqa[0]:X2}");
+            _logCallback?.Invoke(LogLevel.Debug, $"SAK: {abtSak:X2}");
 
             // now reset UID
             _device.Iso14443aCrcAppend(abtHalt, 2);
@@ -215,7 +216,7 @@ namespace LibnfcSharp.Mifare
 
             if (!TransmitBits(abtUnlock1, 7))
             {
-                _logCallback?.Invoke("Warning: Unlock command [1/2]: failed / not acknowledged.");
+                _logCallback?.Invoke(LogLevel.Warning, "Warning: Unlock command [1/2]: failed / not acknowledged.");
             }
             else
             {
@@ -228,11 +229,11 @@ namespace LibnfcSharp.Mifare
 
                 if (TransmitBytes(abtUnlock2, 1))
                 {
-                    _logCallback?.Invoke("Card unlocked");
+                    _logCallback?.Invoke(LogLevel.Information, "Card unlocked");
                 }
                 else
                 {
-                    _logCallback?.Invoke("Warning: Unlock command [2/2]: failed / not acknowledged.");
+                    _logCallback?.Invoke(LogLevel.Warning, "Warning: Unlock command [2/2]: failed / not acknowledged.");
                 }
             }
 

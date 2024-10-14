@@ -7,7 +7,7 @@ namespace LibnfcSharp.Mifare
     {
         public bool ResetCard(byte[] blocksToReset, byte[] blockData)
         {
-            _logCallback?.Invoke("Resetting card...");
+            _logCallback?.Invoke(LogLevel.Information, "Resetting card...");
 
             byte lastAuthenticatedSector = 0xFF;
 
@@ -22,12 +22,12 @@ namespace LibnfcSharp.Mifare
                         if (Authenticate(currentSector, MifareKeyType.KEY_A, FACTORY_KEY) ||
                             Authenticate(currentSector, MifareKeyType.KEY_A, _keyAProviderCallback?.Invoke(currentSector, Uid)))
                         {
-                            _logCallback?.Invoke($"Sector {currentSector} authenticated successfully.");
+                            _logCallback?.Invoke(LogLevel.Debug, $"Sector {currentSector} authenticated successfully.");
                             lastAuthenticatedSector = currentSector;
                         }
                         else
                         {
-                            _logCallback?.Invoke($"Error: Authenticating currentSector {currentSector} failed!");
+                            _logCallback?.Invoke(LogLevel.Error, $"Error: Authenticating currentSector {currentSector} failed!");
                             return false;
                         }
                     }
@@ -35,16 +35,16 @@ namespace LibnfcSharp.Mifare
 
                 if (WriteBlock(blockToReset, blockData))
                 {
-                    _logCallback?.Invoke($"Block {blockToReset} reseted successfully.");
+                    _logCallback?.Invoke(LogLevel.Debug, $"Block {blockToReset} reseted successfully.");
                 }
                 else
                 {
-                    _logCallback?.Invoke($"Error: Writing Block {blockToReset} failed!");
+                    _logCallback?.Invoke(LogLevel.Error, $"Error: Writing Block {blockToReset} failed!");
                     return false;
                 }
             }
 
-            _logCallback?.Invoke("Card reseted successfully.");
+            _logCallback?.Invoke(LogLevel.Information, "Card reseted successfully.");
 
             return true;
         }

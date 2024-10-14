@@ -27,7 +27,7 @@ namespace LibnfcSharp.Mifare
         private NfcTarget _target;
         private bool _enablePerrorLogging = false;
         private Func<byte, byte[], byte[]> _keyAProviderCallback;
-        private Action<string> _logCallback;
+        private Action<LogLevel, string> _logCallback;
 
         private MifareMagicCardType _magicCardType = MifareMagicCardType.GEN_1;
 
@@ -47,7 +47,7 @@ namespace LibnfcSharp.Mifare
         public void RegisterKeyAProviderCallback(Func<byte, byte[], byte[]> keyAProviderCallback) =>
             _keyAProviderCallback = keyAProviderCallback;
 
-        public void RegisterLogCallback(Action<string> logCallback) =>
+        public void RegisterLogCallback(Action<LogLevel, string> logCallback) =>
             _logCallback = logCallback;
 
         public void InitialDevice()
