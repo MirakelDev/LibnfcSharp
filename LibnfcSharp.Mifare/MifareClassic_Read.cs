@@ -118,7 +118,7 @@ namespace LibnfcSharp.Mifare
                 }
             }
 
-            _logCallback?.Invoke(LogLevel.Debug, $"Sector {sector} read successfully.");
+            _logCallback?.Invoke(LogLevel.Information, $"Sector {sector} read successfully.");
 
             return true;
         }
