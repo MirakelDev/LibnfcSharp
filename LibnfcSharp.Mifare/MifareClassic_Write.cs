@@ -113,7 +113,7 @@ namespace LibnfcSharp.Mifare
                 }
                 else
                 {
-                    _logCallback?.Invoke(LogLevel.Error, $"Error: Writing Block {globalBlock} failed!");
+                    _logCallback?.Invoke(LogLevel.Error, $"Error: Writing block {globalBlock} failed!");
                     return false;
                 }
             }

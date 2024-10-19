@@ -130,7 +130,7 @@ namespace LibnfcSharp.Mifare
                 }
                 else
                 {
-                    _logCallback?.Invoke(LogLevel.Error, $"Error: Reading Block {globalBlock} failed!");
+                    _logCallback?.Invoke(LogLevel.Error, $"Error: Reading block {globalBlock} failed!");
                     return false;
                 }
             }
