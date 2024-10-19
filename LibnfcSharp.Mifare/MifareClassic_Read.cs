@@ -86,18 +86,28 @@ namespace LibnfcSharp.Mifare
         {
             sectorData = new byte[BLOCK_SIZE * BLOCKS_PER_SECTOR];
 
+            var keyA = FACTORY_KEY;
+
             if (MagicCardType == MifareMagicCardType.GEN_1 ||
                 MagicCardType == MifareMagicCardType.GEN_2)
             {
-                if (Authenticate(sector, MifareKeyType.KEY_A, FACTORY_KEY) ||
-                    Authenticate(sector, MifareKeyType.KEY_A, _keyAProviderCallback?.Invoke(sector, Uid)))
+                if (Authenticate(sector, MifareKeyType.KEY_A, keyA))
                 {
                     _logCallback?.Invoke(LogLevel.Debug, $"Sector {sector} authenticated successfully.");
                 }
                 else
                 {
-                    _logCallback?.Invoke(LogLevel.Error, $"Error: Authenticating sector {sector} failed!");
-                    return false;
+                    keyA = _keyAProviderCallback?.Invoke(sector, Uid);
+
+                    if (Authenticate(sector, MifareKeyType.KEY_A, keyA))
+                    {
+                        _logCallback?.Invoke(LogLevel.Debug, $"Sector {sector} authenticated successfully.");
+                    }
+                    else
+                    {
+                        _logCallback?.Invoke(LogLevel.Error, $"Error: Authenticating sector {sector} failed!");
+                        return false;
+                    }
                 }
             }
 
@@ -109,11 +119,18 @@ namespace LibnfcSharp.Mifare
                 {
                     Array.Copy(blockData, 0, sectorData, block * BLOCK_SIZE, blockData.Length);
 
+                    if (IsTrailerBlock(globalBlock) &&
+                       (MagicCardType == MifareMagicCardType.GEN_1 ||
+                        MagicCardType == MifareMagicCardType.GEN_2))
+                    {
+                        Array.Copy(keyA, 0, sectorData, block * BLOCK_SIZE, keyA.Length);
+                    }
+
                     _logCallback?.Invoke(LogLevel.Debug, $"Block {globalBlock} read successfully.");
                 }
                 else
                 {
-                    _logCallback?.Invoke(LogLevel.Error, $"Error: Reading Block {globalBlock} failed!");
+                    _logCallback?.Invoke(LogLevel.Error, $"Error: Reading block {globalBlock} failed!");
                     return false;
                 }
             }

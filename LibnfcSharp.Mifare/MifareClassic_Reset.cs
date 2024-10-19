@@ -27,7 +27,7 @@ namespace LibnfcSharp.Mifare
                         }
                         else
                         {
-                            _logCallback?.Invoke(LogLevel.Error, $"Error: Authenticating currentSector {currentSector} failed!");
+                            _logCallback?.Invoke(LogLevel.Error, $"Error: Authenticating sector {currentSector} failed!");
                             return false;
                         }
                     }
@@ -39,7 +39,7 @@ namespace LibnfcSharp.Mifare
                 }
                 else
                 {
-                    _logCallback?.Invoke(LogLevel.Error, $"Error: Writing Block {blockToReset} failed!");
+                    _logCallback?.Invoke(LogLevel.Error, $"Error: Writing block {blockToReset} failed!");
                     return false;
                 }
             }
