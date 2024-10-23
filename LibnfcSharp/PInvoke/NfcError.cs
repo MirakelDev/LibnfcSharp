@@ -15,6 +15,7 @@ namespace LibnfcSharp.PInvoke
 
         [DefaultValue("Operation not supported by device")]
         NFC_EDEVNOTSUPP = -3,
+
         [DefaultValue("No such device")]
         NFC_ENOTSUCHDEV = -4,
 
