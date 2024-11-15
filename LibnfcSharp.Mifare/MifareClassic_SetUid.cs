@@ -83,7 +83,6 @@ namespace LibnfcSharp.Mifare
             if (!TransmitBits(abtReqa, 7))
             {
                 _logCallback?.Invoke(LogLevel.Error, "Error: No tag available");
-
                 return false;
             }
 
@@ -135,7 +134,6 @@ namespace LibnfcSharp.Mifare
                 {
                     _logCallback?.Invoke(LogLevel.Warning, "Warning: BCC check failed!\n");
                 }
-
 
                 // Save UID CL2
                 Array.Copy(_rxBuffer, 0, abtRawUid, 4, 4);
@@ -237,21 +235,34 @@ namespace LibnfcSharp.Mifare
                 }
             }
 
-            TransmitBytes(abtWrite, 4);
-            TransmitBytes(abtData, 18);
-
-            if (format)
+            if (TransmitBytes(abtWrite, 4) && TransmitBytes(abtData, 18))
             {
-                for (byte i = 3; i < 64; i += 4)
+                if (format)
                 {
-                    abtWrite[1] = i;
-                    _device.Iso14443aCrcAppend(abtWrite, 2);
-                    TransmitBytes(abtWrite, 4);
-                    TransmitBytes(abtBlank, 18);
+                    for (byte i = 3; i < 64; i += 4)
+                    {
+                        abtWrite[1] = i;
+                        _device.Iso14443aCrcAppend(abtWrite, 2);
+
+                        if (!TransmitBytes(abtWrite, 4) || !TransmitBytes(abtBlank, 18))
+                        {
+                            _logCallback?.Invoke(LogLevel.Warning, $"Warning: Formatting block {i} failed.");
+                        }
+                    }
                 }
+
+                // Reselect card
+                InitialDevice();
+                WaitForCard();
+
+                return true;
             }
 
-            return true;
+            // Reselect card
+            InitialDevice();
+            WaitForCard();
+
+            return false;
         }
     }
 }
